@@ -1,4 +1,3 @@
-# localisation.py
 import numpy as np
 import plotly.graph_objects as go
 
@@ -14,7 +13,6 @@ def locate_gunshot(toa):
     c = 343.0  # Speed of sound (m/s)
     distances = np.array(toa) * c
 
-    # Use trilateration to find the position (x, y, z)
     A = np.zeros((3, 3))
     b = np.zeros(3)
 
@@ -24,24 +22,17 @@ def locate_gunshot(toa):
                 MIC_POSITIONS[i + 1][0]**2 - MIC_POSITIONS[0][0]**2 + \
                 MIC_POSITIONS[i + 1][1]**2 - MIC_POSITIONS[0][1]**2
 
-    print("Matrix A:\n", A)
-    print("Vector b:\n", b)
-
-    # Check if the matrix is singular
     if np.linalg.det(A) == 0:
         print("Warning: Singular matrix detected! Returning None.")
-        return None  # Handle the singular case
+        return None
 
     location = np.linalg.solve(A, b)
     return location
-
-
 
 def create_plotly_3d_plot(location, mic_positions):
     """Create a 3D plot of the gunshot location and microphone positions."""
     fig = go.Figure()
 
-    # Add microphone positions
     fig.add_trace(go.Scatter3d(
         x=mic_positions[:, 0], y=mic_positions[:, 1], z=mic_positions[:, 2],
         mode='markers',
@@ -49,7 +40,6 @@ def create_plotly_3d_plot(location, mic_positions):
         name='Microphones'
     ))
 
-    # Add gunshot location
     fig.add_trace(go.Scatter3d(
         x=[location[0]], y=[location[1]], z=[location[2]],
         mode='markers',
@@ -57,7 +47,6 @@ def create_plotly_3d_plot(location, mic_positions):
         name='Gunshot Location'
     ))
 
-    # Update layout
     fig.update_layout(scene=dict(
         xaxis_title='X (m)',
         yaxis_title='Y (m)',
@@ -65,5 +54,4 @@ def create_plotly_3d_plot(location, mic_positions):
         aspectmode='cube'
     ))
 
-    plot_html = fig.to_html(full_html=False)
-    return plot_html
+    return fig.to_html(full_html=False)
